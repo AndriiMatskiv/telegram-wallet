@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "rootDir": "src",
+    "types": [],
+    "lib": ["ES6", "DOM"],
+  },
+  "include": [
+    "src/"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+  ]
+}
