@@ -5,6 +5,7 @@ import LocalStoreService from './repositories/LocalStoreService';
 import AccountService from './services/AccountService';
 import AssetService from './services/AssetService';
 import AuthService from './services/AuthService';
+import IntergrationsService from './services/IntergrationsService';
 import WalletService from './services/WalletService';
 
 export const Factory = (bot: TelegramBot, client: Knex) => {
