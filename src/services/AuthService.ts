@@ -22,7 +22,7 @@ export default class AuthService {
     return shouldRefresh;
   }
 
-  public static async validatePassword(msg: TelegramBot.Message): Promise<void> {
+  public static async validatePasswordAction(msg: TelegramBot.Message): Promise<void> {
     const { userId, chatId, msgId } = getIds(msg);
 
     const user = await UserRepository.getByTId(userId);
@@ -37,7 +37,7 @@ export default class AuthService {
     }
   }
 
-  public static async setPassword(msg: TelegramBot.Message): Promise<void> {
+  public static async setPasswordAction(msg: TelegramBot.Message): Promise<void> {
     const { userId, chatId, msgId } = getIds(msg);
     await AuthService.bot.deleteMessage(chatId, msgId.toString());
     if (msg.text.length != 16) {
@@ -50,5 +50,19 @@ export default class AuthService {
     RuntimeStore.removeAction(userId);
     RuntimeStore.setStore(userId, msg.text, storeMsg.message_id);
     await UserRepository.create(userId, await hashPassword(msg.text), storeMsg.message_id);
+  }
+
+  public static async startup(msg: TelegramBot.Message): Promise<void> {
+    const { userId, chatId } = getIds(msg);
+    const user = await UserRepository.getByTId(userId);
+    
+    if (!user) {
+      AuthService.bot.sendMessage(chatId, "Hello There! Let's create account.");
+      AuthService.bot.sendMessage(chatId, "Please set local password, it should be 16 characters.", { });
+      RuntimeStore.setAction(userId, 'password_setup');
+    } else {
+      AuthService.bot.sendMessage(chatId, 'Hello There! Please login.');
+      RuntimeStore.setAction(userId, 'password_input');
+    }
   }
 }
