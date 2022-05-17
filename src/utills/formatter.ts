@@ -8,3 +8,8 @@ export const getNewAccountId = (accounts: Account[]): number => {
   accounts.forEach((account) => max = account.id > max ? account.id : max);
   return max + 1;
 };
+
+export const round = (num: number | null, d: number = 3): string => {
+  if (!num || isNaN(num)) return '0';
+  return (Math.floor(num * 10 ** d) / 10 ** d).toString().toLocaleString();
+};

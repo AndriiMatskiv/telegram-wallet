@@ -17,6 +17,14 @@ const ActionsMap: Record<ActionTypes, (msg: TelegramBot.Message) => Promise<void
   'account_import': AccountService.importAccountAction,
   'current_account_set': AccountService.setCurrentAccountAction,
   'current_network_set': AccountService.setCurrentNetworkAction,
+  'eth_send_1': (msg) => WalletService.sendEthAction(msg, 1),
+  'eth_send_2': (msg) => WalletService.sendEthAction(msg, 2),
+  'eth_send_3': (msg) => WalletService.sendEthAction(msg, 3),
+  'asset_send_1': (msg) => WalletService.sendAssetAction(msg, 1),
+  'asset_send_2': (msg) => WalletService.sendAssetAction(msg, 2),
+  'asset_send_3': (msg) => WalletService.sendAssetAction(msg, 3),
+  'asset_send_4': (msg) => WalletService.sendAssetAction(msg, 4),
+  'tx_info': WalletService.getTransactionInfoActoin,
 }
 
 export const botMain = async (bot: TelegramBot, client: Knex): Promise<void> => {
@@ -44,6 +52,13 @@ export const botMain = async (bot: TelegramBot, client: Knex): Promise<void> => 
   bot.onText(/\/export-account/, AccountService.exportAccount);
   bot.onText(/\/import-account/, AccountService.importAccount);
 
+  bot.onText(/\/send-eth/, WalletService.sendEth);
+  bot.onText(/\/send-asset/, WalletService.sendAsset);
+  bot.onText(/\/transactions/, WalletService.getTransactions);
+  bot.onText(/\/transaction-info/, WalletService.getTransactionInfo);
+
+  bot.onText(/\/assets/, AssetService.getAssets)
+
   //TODO implement
   bot.onText(/\/stake-asset/, IntergrationService.stakeAsset);
   bot.onText(/\/unstake-asset/, IntergrationService.unstakeAsset);
@@ -52,14 +67,4 @@ export const botMain = async (bot: TelegramBot, client: Knex): Promise<void> => 
   bot.onText(/\/unstake-lp/, IntergrationService.unstakeLp);
   bot.onText(/\/get-lp-reward/, IntergrationService.getLpReward);
   bot.onText(/\/swap/, IntergrationService.swap);
-  bot.onText(/\/bridge/, IntergrationService.bridge);
-
-  bot.onText(/\/send-eth/, WalletService.sendEth);
-  bot.onText(/\/send-asset/, WalletService.sendAsset);
-  bot.onText(/\/transactions/, WalletService.getTransactions);
-  bot.onText(/\/transaction-info/, WalletService.getTransactionInfo);
-
-  bot.onText(/\/assets/, AssetService.getAssets);
-  bot.onText(/\/add-asset/, AssetService.addAsset);
-  bot.onText(/\/forget-asset/, AssetService.forgetAsset);
-};
+}

@@ -20,6 +20,4 @@ export default class IntergrationService {
   public static async getLpReward(msg: TelegramBot.Message): Promise<void> {}
 
   public static async swap(msg: TelegramBot.Message): Promise<void> {}
-
-  public static async bridge(msg: TelegramBot.Message): Promise<void> {}
 }

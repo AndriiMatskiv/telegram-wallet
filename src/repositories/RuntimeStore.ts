@@ -19,7 +19,7 @@ export default class RuntimeStore {
   }
 
   public static setStore(id: number, password: string, msgId: number): void {
-    RuntimeStore.session[id] = { password, msgId, lastLogin: new Date().getTime() };
+    RuntimeStore.session[id] = { password, msgId, lastLogin: new Date().getTime(), temp: {} };
   }
 
   public static getAction(id: number): ActionTypes {
@@ -28,7 +28,7 @@ export default class RuntimeStore {
 
   public static setAction(id: number, action: ActionTypes): void {
     if (!RuntimeStore.session[id]) {
-      RuntimeStore.session[id] = { currentAction: action };
+      RuntimeStore.session[id] = { currentAction: action, temp: {} };
     } else {
       RuntimeStore.session[id].currentAction = action
     }
@@ -36,5 +36,24 @@ export default class RuntimeStore {
 
   public static removeAction(id: number): void {
     RuntimeStore.session[id].currentAction = null;
+  }
+
+  public static setTempData(id: number, key: string, val: any): void {
+    RuntimeStore.session[id].temp[key] = val;
+  }
+
+  public static getAndDeleteTempData(id: number, key: string): any {
+    const data = RuntimeStore.session[id].temp[key];
+    RuntimeStore.session[id].temp[key] = undefined;
+    return data;
+  }
+
+  public static getTempData(id: number, key: string): any {
+    const data = RuntimeStore.session[id].temp[key];
+    return data;
+  }
+
+  public static deleteTempData(id: number, key: string): void {
+    RuntimeStore.session[id].temp[key] = undefined;
   }
 }

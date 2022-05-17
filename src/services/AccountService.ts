@@ -3,7 +3,7 @@ import { Account } from '../types';
 import { generateMarkup, getIds, RemoveButtons } from '../utills/helpers';
 import LocalStoreService from '../repositories/LocalStoreService';
 import RuntimeStore from '../repositories/RuntimeStore';
-import { Web3Service } from './Web3Service';
+import Web3Helper from '../utills/web3';
 import { cutAddress, getNewAccountId } from '../utills/formatter';
 import AuthService from './AuthService';
 import { Networks } from '../utills/network';
@@ -23,7 +23,7 @@ export default class AccountService {
     AccountService.bot.sendMessage(chatId, 'OK', RemoveButtons);
     RuntimeStore.removeAction(userId);
     const store = await LocalStoreService.getStore(userId, chatId);
-    const address = await Web3Service.privateKeyToPublic(store.currentNetworkId, msg.text);
+    const address = await Web3Helper.privateKeyToPublic(store.currentNetworkId, msg.text);
     const newId = getNewAccountId(store.accounts);
     const newAccount: Account = { privateKey: msg.text, id: newId, address, name: `Account ${newId}`, imported: true };
     const newStore = { ...store, accounts: [...store.accounts, newAccount] };
@@ -59,7 +59,7 @@ export default class AccountService {
 
     const accounts = store.accounts;
     const network = Networks[store.currentNetworkId];
-    const balances = await Web3Service.getAccountsBalances(store.currentNetworkId, accounts);
+    const balances = await Web3Helper.getAccountsBalances(store.currentNetworkId, accounts);
 
     let txt = 'Accounts\n';
 
@@ -80,7 +80,7 @@ export default class AccountService {
     const { userId, chatId } = getIds(msg);
     const store = await LocalStoreService.getStore(userId, chatId);
 
-    const { address, pk } = Web3Service.createAccount(store.currentNetworkId);
+    const { address, pk } = Web3Helper.createAccount(store.currentNetworkId);
     const newId = getNewAccountId(store.accounts);
     const newAccount: Account = { privateKey: pk, id: newId, address, name: `Account ${newId}`, imported: false };
     const newStore = { ...store, currentAccountId: newId, accounts: [...store.accounts, newAccount] };

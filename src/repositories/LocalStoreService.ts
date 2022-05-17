@@ -1,13 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { Account } from '../types';
 import RuntimeStore from './RuntimeStore';
 import crypto from 'crypto'; 
-
-export interface LocalStore {
-  accounts: Account[];
-  currentAccountId?: number;
-  currentNetworkId: number;
-}
+import { LocalStore } from '../types';
 
 export default class LocalStoreService {
   private static bot: TelegramBot;
