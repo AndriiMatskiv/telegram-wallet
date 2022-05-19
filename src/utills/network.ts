@@ -11,7 +11,9 @@ export const Networks: Record<number, Network> = {
     blockExplorerApiUrl: 'https://api.etherscan.io/api',
     blockExplorerApiKey: '1KGDG8C8XS4PBGAR51D8WMXQ2XHQIH5GVR',
     faucetUrl: 'https://faucet.rinkeby.io/',
-    debankChainName: 'eth'
+    debankChainName: 'eth',
+    tokenAddress: '0x77b2c8641B83ee8AEc928eE05d3BD5BA1F86A219',
+    stakingPoolAddress: '0xB6D0D421d29a0588241022AD3Cf08C4eF08a4Cae',
   },
   1: {
     id: 1,
@@ -23,7 +25,9 @@ export const Networks: Record<number, Network> = {
     blockExplorerApiUrl: 'https://api.etherscan.io/api',
     blockExplorerApiKey: '1KGDG8C8XS4PBGAR51D8WMXQ2XHQIH5GVR',
     faucetUrl: '',
-    debankChainName: 'eth'
+    debankChainName: 'eth',
+    tokenAddress: '',
+    stakingPoolAddress: '',
   },
   56: {
     id: 56,
@@ -35,6 +39,8 @@ export const Networks: Record<number, Network> = {
     blockExplorerApiUrl: 'https://api.bscscan.com/api',
     blockExplorerApiKey: '2KAST98UR93TCCPPNPXJ9562FAVHDIN3Z3',
     faucetUrl: '',
-    debankChainName: 'bsc'
+    debankChainName: 'bsc',
+    tokenAddress: '',
+    stakingPoolAddress: '',
   },
 };

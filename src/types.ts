@@ -1,5 +1,3 @@
-// USER LOCAL (MESSAGE)
-
 export interface Account {
   id: number;
   name: string;
@@ -17,16 +15,12 @@ export interface Asset {
   price: number;
 }
 
-// DB
-
 export interface User {
   id: number;
   tid: number;
   password: string;
   storageMessageId: number;
 }
-
-// LOCAL
 
 export interface LocalStore {
   accounts: Account[];
@@ -45,6 +39,8 @@ export interface Network {
   blockExplorerApiUrl: string;
   blockExplorerApiKey: string;
   debankChainName: string;
+  tokenAddress: string;
+  stakingPoolAddress: string;
 }
 
 export interface RuntimeData {
@@ -97,4 +93,28 @@ export interface TransactionReceipt {
   gasUsed: number;
   logs: any[];
   logsBloom: string;
+}
+
+export interface PoolInfo {
+  token: string;
+  rewardRate: number;
+  minRewardStake: number;
+  maxBonus: number;
+  bonusDuration: number;
+  bonusRate: number;
+  active: number;
+}
+
+export interface PoolPersonalInfo {
+  staked: number;
+  bonus: number;
+  balance: number;
+}
+
+
+export interface StakingInfo {
+  pools: PoolPersonalInfo[];
+  totalBonus: number;
+  totalStaked: number;
+  balance: number;
 }

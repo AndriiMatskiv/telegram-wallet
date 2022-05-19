@@ -4,7 +4,7 @@ import { Account, Asset, TransactionReceipt } from "../types";
 import { Networks } from "../utills/network";
 
 export default class Web3Helper {
-  private static currentWeb3 = (networkId: number) => new Web3(Networks[networkId].rpcUrl);
+  public static currentWeb3 = (networkId: number) => new Web3(Networks[networkId].rpcUrl);
   
   public static async privateKeyToPublic(networkId: number, pk: string): Promise<string> {
     const result = Web3Helper.currentWeb3(networkId).eth.accounts.privateKeyToAccount(pk);
