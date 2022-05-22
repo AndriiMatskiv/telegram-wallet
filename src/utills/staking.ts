@@ -16,7 +16,8 @@ export default class StakingHelper {
 
   public static async getPoolInfo(network: Network, poolId: number): Promise<PoolInfo> {
     const contract = StakingHelper.getContract(network);
-    return await contract.methods.poolInfo(poolId).call();
+    const info = await contract.methods.poolInfo(poolId).call();
+    return { ...info, id: poolId };
   } 
 
   public static async getPrice(network: Network): Promise<number> {
@@ -49,7 +50,7 @@ export default class StakingHelper {
       contract.methods.balanceOf(account.address, poolId).call(),
     ]);
 
-    return { staked, bonus, balance }
+    return { staked: Number(Web3.utils.fromWei(staked)), bonus: Number(bonus), balance: Number(balance) }
   }
 
   public static async stake(network: Network, account: Account, amount: number, poolId: number): Promise<void> {
@@ -80,7 +81,7 @@ export default class StakingHelper {
       from: account.address,
       to: network.stakingPoolAddress,
       value,
-      gas: 30000,
+      gas: 300000,
       data,
      };
 

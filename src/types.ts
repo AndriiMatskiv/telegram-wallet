@@ -64,6 +64,14 @@ export type ActionTypes =
   'asset_send_2' |
   'asset_send_3' |
   'asset_send_4' |
+  'stake_1' |
+  'stake_2' |
+  'stake_3' |
+  'unstake_1' |
+  'unstake_2' |
+  'unstake_3' |
+  'approve_asset_1' |
+  'approve_asset_2' |
   'tx_info';
 
 
@@ -103,6 +111,7 @@ export interface PoolInfo {
   bonusDuration: number;
   bonusRate: number;
   active: number;
+  id: number;
 }
 
 export interface PoolPersonalInfo {
@@ -116,5 +125,12 @@ export interface StakingInfo {
   pools: PoolPersonalInfo[];
   totalBonus: number;
   totalStaked: number;
+  balance: number;
+}
+
+export interface TokenInfo {
+  name: string;
+  symbol: string;
+  decimals: number;
   balance: number;
 }

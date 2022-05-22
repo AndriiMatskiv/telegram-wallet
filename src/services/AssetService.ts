@@ -4,6 +4,7 @@ import { getPortifolioByChain } from "../utills/apis";
 import { round } from "../utills/formatter";
 import { getIds } from "../utills/helpers";
 import { Networks } from "../utills/network";
+import Web3Helper from "../utills/web3";
 import AuthService from "./AuthService";
 
 export default class AssetService {
@@ -19,13 +20,25 @@ export default class AssetService {
     const { userId, chatId } = getIds(msg);
     const store = await LocalStoreService.getStore(userId, chatId);
     const network = Networks[store.currentNetworkId];
-    const currAddress = store.accounts[store.currentAccountId].address;
+    const account = store.accounts.find(account => account.id === store.currentAccountId);
 
-    const assets = await getPortifolioByChain(currAddress, network);
+    const assets = await getPortifolioByChain(account.address, network);
 
-    let txt = 'Assets\n';
+    const foundTwt = assets.find((asset) => asset.address === network.tokenAddress);
+    if (!foundTwt) {
+      assets.push({
+        address: network.tokenAddress,
+        symbol: 'TWT',
+        decimals: 18,
+        name: 'TW Token',
+        balance: await Web3Helper.getAssstBalance(network.id, network.tokenAddress, account),
+        price: 0,
+      });
+    }
 
-    assets.forEach((asset) => txt += `${asset.name}(${asset.symbol}) ≈ $${round(asset.balance * asset.price, 1)}\n`);
+    let txt = 'Assets\n\n';
+
+    assets.forEach((asset) => txt += `${asset.name}(${asset.symbol}): ${round(asset.balance, 0)} ≈ $${round(asset.balance * asset.price, 1)}\n`);
 
     AssetService.bot.sendMessage(chatId, txt);
   }

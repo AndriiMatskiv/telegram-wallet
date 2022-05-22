@@ -1,4 +1,4 @@
-import TelegramBot  from 'node-telegram-bot-api';
+import TelegramBot from 'node-telegram-bot-api';
 import { Account } from '../types';
 import { generateMarkup, getIds, RemoveButtons } from '../utills/helpers';
 import LocalStoreService from '../repositories/LocalStoreService';
@@ -16,7 +16,7 @@ export default class AccountService {
   public static init(bot: TelegramBot) {
     AccountService.bot = bot;
   }
-  
+
   public static async importAccountAction(msg: TelegramBot.Message): Promise<void> {
     const { userId, chatId, msgId } = getIds(msg);
 
@@ -28,13 +28,13 @@ export default class AccountService {
     const newAccount: Account = { privateKey: msg.text, id: newId, address, name: `Account ${newId}`, imported: true };
     const newStore = { ...store, accounts: [...store.accounts, newAccount] };
     LocalStoreService.updateStore(userId, chatId, newStore);
- 
+
     AccountService.bot.deleteMessage(chatId, msgId.toString());
   }
 
   public static async importAccount(msg: TelegramBot.Message): Promise<void> {
     if (AuthService.shouldRefersh(msg)) return;
-    
+
     const { userId, chatId } = getIds(msg);
     AccountService.bot.sendMessage(chatId, "Please pass private key");
     RuntimeStore.setAction(userId, 'account_import');
@@ -66,7 +66,7 @@ export default class AccountService {
     accounts.forEach((account, index) => {
       const s = store.currentAccountId == account.id ? '✓' : '';
       const n = account.name;
-      const a = cutAddress(account.address);
+      const a = account.address;
       const b = Number(Web3.utils.fromWei(balances[index])).toFixed(3);
       txt += `${s} ${n} ${a}\n${b} ${network.currencySymbol}\n`
     });
@@ -84,7 +84,7 @@ export default class AccountService {
     const newId = getNewAccountId(store.accounts);
     const newAccount: Account = { privateKey: pk, id: newId, address, name: `Account ${newId}`, imported: false };
     const newStore = { ...store, currentAccountId: newId, accounts: [...store.accounts, newAccount] };
-    
+
     await LocalStoreService.updateStore(userId, chatId, newStore);
     AccountService.bot.sendMessage(chatId, `New address: ${address}`);
   }
@@ -94,7 +94,7 @@ export default class AccountService {
 
     const { userId, chatId } = getIds(msg);
     const networks = Object.values(Networks);
-    
+
     const texts = networks.map((network) => `${network.id} ${network.name}`);
     const buttons = generateMarkup(texts);
 
@@ -125,7 +125,7 @@ export default class AccountService {
   public static async setCurrentAccountAction(msg: TelegramBot.Message): Promise<void> {
     const { userId, chatId, msgId } = getIds(msg);
     const store = await LocalStoreService.getStore(userId, chatId);
-    
+
     const id = Number(msg.text.split(' ')[1]);
 
     if (!!id) {
@@ -144,7 +144,7 @@ export default class AccountService {
     const store = await LocalStoreService.getStore(userId, chatId);
 
     const networkId = Number(msg.text.split(' ')[0]);
-    
+
     if (networkId > 0) {
       RuntimeStore.removeAction(userId);
       AccountService.bot.sendMessage(chatId, 'OK', RemoveButtons);

@@ -22,7 +22,7 @@ export default class WalletService {
 
     const store = await LocalStoreService.getStore(userId, chatId);
     const network = Networks[store.currentNetworkId];
-    const account = store.accounts[store.currentAccountId];
+    const account = store.accounts.find(account => account.id === store.currentAccountId);
 
     if (step === 1) {
       const address = msg.text;
@@ -69,7 +69,7 @@ export default class WalletService {
             await Web3Helper.sendEth(network.id, account, recipient, amount);
             await WalletService.bot.sendMessage(chatId, 'Successfully sent.');
           } catch(e) {
-            await WalletService.bot.sendMessage(chatId, `Eth sending error: ${e}`);
+            await WalletService.bot.sendMessage(chatId, `Eth sending error: ${e}`, RemoveButtons);
           } 
           resolve();
         });
@@ -94,7 +94,7 @@ export default class WalletService {
 
     const store = await LocalStoreService.getStore(userId, chatId);
     const network = Networks[store.currentNetworkId];
-    const account = store.accounts[store.currentAccountId];
+    const account = store.accounts.find(account => account.id === store.currentAccountId);
 
     if (step === 1) {
       const btnsTexts: string[] = RuntimeStore.getTempData(userId, 'assets_btns');
@@ -156,7 +156,7 @@ export default class WalletService {
             await Web3Helper.sendAsset(network.id, selectedAsset, recipient, amount, account);
             await WalletService.bot.sendMessage(chatId, 'Successfully sent.');
           } catch(e) {
-            await WalletService.bot.sendMessage(chatId, `Eth sending error: ${e}`);
+            await WalletService.bot.sendMessage(chatId, `Eth sending error: ${e}`, RemoveButtons);
           } 
           resolve();
         });
@@ -174,7 +174,7 @@ export default class WalletService {
     const { userId, chatId } = getIds(msg);
     const store = await LocalStoreService.getStore(userId, chatId);
     const network = Networks[store.currentNetworkId];
-    const currAddress = store.accounts[store.currentAccountId].address;
+    const currAddress = store.accounts.find(account => account.id === store.currentAccountId).address;
 
     const assets = await getPortifolioByChain(currAddress, network);
 
@@ -196,7 +196,7 @@ export default class WalletService {
     const { userId, chatId } = getIds(msg);
     const store = await LocalStoreService.getStore(userId, chatId);
     const network = Networks[store.currentNetworkId];
-    const currAddress = store.accounts[store.currentAccountId].address;
+    const currAddress = store.accounts.find(account => account.id === store.currentAccountId).address;
 
     const transactions = await getTransactions(currAddress, network);
     const texts = transactions.map((tx) => `Hash: ${tx.hash} From: ${cutAddress(tx.from)} To ${cutAddress(tx.to)} At Block: ${tx.blockNumber}`);
@@ -230,5 +230,69 @@ export default class WalletService {
     const { userId, chatId } = getIds(msg);
     WalletService.bot.sendMessage(chatId, "Please insert transaction hash");
     RuntimeStore.setAction(userId, 'tx_info');
+  }
+
+
+  public static async approveAssetAction(msg: TelegramBot.Message, step: number): Promise<void> {
+    const { userId, chatId, msgId } = getIds(msg);
+    const store = await LocalStoreService.getStore(userId, chatId);
+    const network = Networks[store.currentNetworkId];
+    const account = store.accounts.find(account => account.id === store.currentAccountId);
+
+    if (step === 1) {
+      let arr;
+
+      if (msg.text.split(',').length == 3) {
+        arr = msg.text.split(',');
+      } else if (msg.text.split(' ').length == 3) {
+        arr = msg.text.split(' ');
+      } else {
+        WalletService.bot.sendMessage(chatId, 'Invalid parameters, please try again');
+        WalletService.bot.deleteMessage(chatId, msgId.toString());
+      }
+
+      const token = arr[0].trim();
+      const spender = arr[1].trim();
+      const amount = Number(arr[2].trim());
+      
+      RuntimeStore.removeAction(userId);
+      const buttons = generateMarkup(['Cancel', 'Confirm']);
+
+      const tokenInfo = await Web3Helper.getTokenInfo(network.id, token, account);
+
+      WalletService.bot.sendMessage(chatId, `You are going to approve ${amount} ${tokenInfo.name} to ${cutAddress(spender)}`, {
+        reply_markup: buttons,
+      });
+
+      RuntimeStore.setTempData(userId, 'approve_data', { token, spender, amount });
+      RuntimeStore.setAction(userId, 'approve_asset_2');
+    } else {
+      if (msg.text === 'Confirm') {
+        WalletService.bot.sendMessage(chatId, `Approving...`, RemoveButtons);
+        const  { token, spender, amount } =  RuntimeStore.getAndDeleteTempData(userId, 'approve_data');
+
+        new Promise<void>(async (resolve) => {
+          try {
+            await Web3Helper.approveAsset(network.id, token, spender, amount, account);
+            await WalletService.bot.sendMessage(chatId, 'Successfully approved.');
+          } catch(e) {
+            await WalletService.bot.sendMessage(chatId, `Eth sending error: ${e}`, RemoveButtons);
+          } 
+          resolve();
+        });
+      } else {
+        WalletService.bot.sendMessage(chatId, 'Ok', RemoveButtons);
+        WalletService.bot.deleteMessage(chatId, msgId.toString());
+      }
+      RuntimeStore.removeAction(userId);
+    }
+  }
+
+  public static async approveAsset(msg: TelegramBot.Message): Promise<void> {
+    if (AuthService.shouldRefersh(msg)) return;
+
+    const { userId, chatId } = getIds(msg);
+    WalletService.bot.sendMessage(chatId, "Please select asset address, spender address and amount");
+    RuntimeStore.setAction(userId, 'approve_asset_1');
   }
 }

@@ -24,6 +24,14 @@ const ActionsMap: Record<ActionTypes, (msg: TelegramBot.Message) => Promise<void
   'asset_send_2': (msg) => WalletService.sendAssetAction(msg, 2),
   'asset_send_3': (msg) => WalletService.sendAssetAction(msg, 3),
   'asset_send_4': (msg) => WalletService.sendAssetAction(msg, 4),
+  'stake_1': (msg) => IntergrationService.stakeAssetAction(msg, 1),
+  'stake_2': (msg) => IntergrationService.stakeAssetAction(msg, 2),
+  'stake_3': (msg) => IntergrationService.stakeAssetAction(msg, 3),
+  'unstake_1': (msg) => IntergrationService.unstakeAssetAction(msg, 1),
+  'unstake_2': (msg) => IntergrationService.unstakeAssetAction(msg, 2),
+  'unstake_3': (msg) => IntergrationService.unstakeAssetAction(msg, 3),
+  'approve_asset_1': (msg) => WalletService.approveAssetAction(msg, 1),
+  'approve_asset_2': (msg) => WalletService.approveAssetAction(msg, 2),
   'tx_info': WalletService.getTransactionInfoActoin,
 }
 
@@ -54,17 +62,14 @@ export const botMain = async (bot: TelegramBot, client: Knex): Promise<void> => 
 
   bot.onText(/\/send-eth/, WalletService.sendEth);
   bot.onText(/\/send-asset/, WalletService.sendAsset);
+  bot.onText(/\/approve/, WalletService.approveAsset);
   bot.onText(/\/transactions/, WalletService.getTransactions);
   bot.onText(/\/transaction-info/, WalletService.getTransactionInfo);
 
   bot.onText(/\/assets/, AssetService.getAssets)
 
-  //TODO implement
-  bot.onText(/\/stake-asset/, IntergrationService.stakeAsset);
-  bot.onText(/\/unstake-asset/, IntergrationService.unstakeAsset);
-  bot.onText(/\/get-staked-reward/, IntergrationService.getReward);
-  bot.onText(/\/stake-lp/, IntergrationService.stakeLP);
-  bot.onText(/\/unstake-lp/, IntergrationService.unstakeLp);
-  bot.onText(/\/get-lp-reward/, IntergrationService.getLpReward);
-  bot.onText(/\/swap/, IntergrationService.swap);
+  bot.onText(/\/staking-pools/, IntergrationService.getPoolInfos);
+  bot.onText(/\/my-staking-info/, IntergrationService.getMyInfo);
+  bot.onText(/\/stake/, IntergrationService.stakeAsset);
+  bot.onText(/\/unstake/, IntergrationService.unstakeAsset);
 }
